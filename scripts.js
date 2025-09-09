@@ -1,6 +1,6 @@
 // the code inside of the function below is given on the page for this API on the Rapid API Hub
 // We will add a call to another function we'll write that will display the data returned by the API
-function getPhotos(){
+function getPhotos() {
     // from rapid API - random cat pictures
     // https://rapidapi.com/rvaldezit/api/cat14/
 
@@ -22,27 +22,27 @@ function getPhotos(){
     const xhr = new XMLHttpRequest();
     xhr.withCredentials = true;
 
-    xhr.addEventListener('readystatechange', function () {
+    xhr.addEventListener("readystatechange", function () {
         if (this.readyState === this.DONE) {
             console.log(this.responseText);
             // convert the returned data from a string to JSON data
             let json = JSON.parse(this.response);
-            console.log('the JSON after parsing, before sending to display', json);
+            console.log("the JSON after parsing, before sending to display", json);
             // send the JSON data to our function to display it
             displayPhotos(json);
         }
     });
 
-    xhr.open('GET', 'https://cat14.p.rapidapi.com/v1/images/search?limit=10');
-    xhr.setRequestHeader('X-RapidAPI-Key', 'df89e32c09mshf69a2dfbaefc3ebp1de1c8jsnea0ff3d093d7');
-    xhr.setRequestHeader('X-RapidAPI-Host', 'cat14.p.rapidapi.com');
+    xhr.open("GET", "https://cat14.p.rapidapi.com/v1/images/search?limit=10");
+    xhr.setRequestHeader("X-RapidAPI-Key", "df89e32c09mshf69a2dfbaefc3ebp1de1c8jsnea0ff3d093d7");
+    xhr.setRequestHeader("X-RapidAPI-Host", "cat14.p.rapidapi.com");
 
     xhr.send(data);
 }
 
 // the function below will use the returned JSON data to display the cat photos
-function displayPhotos(json){
-    console.log('the parsed JSON data: ', json);
+function displayPhotos(json) {
+    console.log("the parsed JSON data: ", json);
     // console.log(typeof(json));
     // what we get back from this call is an array of JSON objects
     // each object includes the following properties:
@@ -57,45 +57,56 @@ function displayPhotos(json){
 
     let output = "";
 
-    for(let photo of json){
-        // TO DO
+    for (let photo of json) {
         output += `
-            <img src="${"add image url here"}" alt="" width="${"add image width here"}" height="${"add image height here"}">
+            <img src="${photo.url}" alt="" width="${photo.width}" height="${photo.height}">
         `;
-
     }
 
     outputDiv.innerHTML = output;
 }
 
 // the function that will display the data from our JSON file of users to the console
-function getUsers(data){
-    console.log('This is our user data from the file: ', data);
-    // TO DO - ADD USER INFO TO PAGE
+function getUsers(data) {
+    console.log("This is our user data from the file: ", data);
+    const outputDiv = document.querySelector("#users");
+    let output = "";
+
+    for (let user of data.results) {
+        let birthday = new Date(user.dob.date);
+        output += `
+            <section>
+                <h3>${user.name.first} ${user.name.last}</h3>
+                <p>${user.login.username}</p>
+                <img src="${user.picture.large}" alt="" width="160" height="160"> </img>
+                <p>Birthday: ${birthday.getMonth() + 1} - ${birthday.getDay()} - ${birthday.getFullYear()}</p>
+                <a href="mailto:${user.email}">${user.email}</a>
+            </section>
+        `;
+    }
+    outputDiv.innerHTML = output;
 }
 
 // call the function to display the cat photos on page load
-// the window.onload handler is where we can attach event handlers 
+// the window.onload handler is where we can attach event handlers
 // that won't be added to the page until the content has loaded
-window.onload = function(){
+window.onload = function () {
     getPhotos();
 
-    // get the data stored in our local JSON file so we can use it 
+    // get the data stored in our local JSON file so we can use it
     // to display portions of the data returned
-    // this only works if you open your HTML file using the live 
+    // this only works if you open your HTML file using the live
     // server option in VS Code, I will demonstrate
     fetch("users.json")
-        .then(response => response.json())
-        .then(data => getUsers(data));
+        .then((response) => response.json())
+        .then((data) => getUsers(data));
 };
-
-
 
 // we'll also play around some with the Random User API
 // https://randomuser.me/
 // https://randomuser.me/api/?results=12&nat=us
 // this one is great because you do not need a key to use it
-// that means you can practice calls without worrying about 
+// that means you can practice calls without worrying about
 // running out, and you can paste the endpoint into your browser
 // to test it and see the data returned
 
